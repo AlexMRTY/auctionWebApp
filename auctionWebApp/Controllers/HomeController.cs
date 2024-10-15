@@ -3,6 +3,7 @@ using auctionWebApp.core;
 using auctionWebApp.core.Interface;
 using Microsoft.AspNetCore.Mvc;
 using auctionWebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace auctionWebApp.Controllers;
 
