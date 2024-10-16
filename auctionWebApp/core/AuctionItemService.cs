@@ -1,7 +1,9 @@
-﻿using auctionWebApp.core.Interface;
+﻿using System.Data;
+using auctionWebApp.core.Interface;
 using auctionWebApp.Models;
 using auctionWebApp.persistence;
 using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 
 namespace auctionWebApp.core;
 
@@ -17,13 +19,24 @@ public class AuctionItemService : IAuctionItemService
     }
     public List<AuctionItem> GetAllAuctionItems()
     {
-        List<AuctionItemDb> auctionItemDbs = _auctionItemPersistence.GetAll();
-        List<AuctionItem> auctionItems = new List<AuctionItem>();
-        foreach (var auctionItemDb in auctionItemDbs)
+        List<AuctionItem> auctionItems;
+        try
         {
-            AuctionItem auctionItem = _mapper.Map<AuctionItem>(auctionItemDb);
-            auctionItems.Add(auctionItem);
+            List<AuctionItemDb> auctionItemDbs = _auctionItemPersistence.GetAll(
+                a => a.EndTime > DateTime.Now, 
+                q => q.OrderBy(a => a.EndTime)
+            );
+            auctionItems = new List<AuctionItem>();
+            foreach (var auctionItemDb in auctionItemDbs)
+            {
+                AuctionItem auctionItem = _mapper.Map<AuctionItem>(auctionItemDb);
+                auctionItems.Add(auctionItem);
+            }
+        } catch (DataException e)
+        {
+            throw new DataException("No items found");
         }
+         
         return auctionItems;
     }
     
@@ -34,12 +47,42 @@ public class AuctionItemService : IAuctionItemService
     
     public AuctionItem GetAuctionItemById (int id)
     {
-        throw new NotImplementedException();
+        return _mapper.Map<AuctionItem>(_auctionItemPersistence.GetById(id));
     }
     
     public void CreateAuctionItem (AuctionItemVm auctionItemVm)
     {
+        if (
+            auctionItemVm.Name.IsNullOrEmpty() ||
+            auctionItemVm.Description.IsNullOrEmpty() ||
+            auctionItemVm.StartingPrice <= 0
+        ) throw new DataException();
+        
         _auctionItemPersistence.Add(_mapper.Map<AuctionItemDb>(auctionItemVm));
+    }
+    
+    public void UpdateDescription(int id, string description)
+    {
+        if (description.IsNullOrEmpty()) throw new DataException();
+
+        AuctionItemDb item;
+        try
+        {
+            item = _auctionItemPersistence.GetById(id);
+        } catch (DataException e)
+        {
+            throw new DataException("Item not found");
+        }
+        
+        item.Description = description;
+
+        try
+        {
+            _auctionItemPersistence.Update(item);
+        } catch (DataException e)
+        {
+            throw new DataException("Update failed");
+        }
     }
 
     // private static readonly IReadOnlyList<AuctionItem> _auctionItems;

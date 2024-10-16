@@ -8,5 +8,4 @@ public class AuctionItemPersistence : GenericPersistence<AuctionItemDb>, IAuctio
     public AuctionItemPersistence(AuctionDbContext context) : base(context)
     {
     }
-    
 }

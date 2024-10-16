@@ -9,4 +9,5 @@ public interface IAuctionItemService
     AuctionItem GetAuctionItemById (int id);
     
     void CreateAuctionItem (AuctionItemVm auctionItemVm);
+    public void UpdateDescription(int id, string description);
 }

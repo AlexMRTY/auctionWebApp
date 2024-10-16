@@ -1,4 +1,5 @@
-﻿using auctionWebApp.persistence.Interfaces;
+﻿using System.Linq.Expressions;
+using auctionWebApp.persistence.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace auctionWebApp.persistence;
@@ -24,9 +25,24 @@ public class GenericPersistence<T> : IGenericPersistence<T> where T : BaseDB
         _context.SaveChanges();
     }
 
-    public List<T> GetAll()
+    public List<T> GetAll(Expression<Func<T, bool>>? filter = null,
+        Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null)
     {
-        return this.entity.ToList();   
+        IQueryable<T> query = entity;
+        
+        // Apply filtering if a filter is provided
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+        
+        // Apply ordering if an orderBy expression is provided
+        if (orderBy != null)
+        {
+            query = orderBy(query);
+        }
+        
+        return query.ToList();
     }
 
     public T GetById(int id)
