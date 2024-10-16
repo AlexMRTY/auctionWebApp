@@ -32,5 +32,10 @@ public class AuctionItemDb : BaseDB
     // navigation property
     public List<BidDb> Bids { get; set; } = new List<BidDb>();
 
+    public AuctionItemDb()
+    {
+        
+    }
 
+    
 }

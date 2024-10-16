@@ -25,6 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Views\Auction\" />
       <Folder Include="Views\Home\" />
     </ItemGroup>
 

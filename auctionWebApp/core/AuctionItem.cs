@@ -5,7 +5,7 @@ public class AuctionItem
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public string UserId { get; set; }
+    public string UserName { get; set; }
     public string Description { get; set; }
     public bool IsOpen { get; set; }
     public decimal StartingPrice { get; set; }
@@ -14,10 +14,10 @@ public class AuctionItem
     public DateTime EndTime { get; set; }
     public List<Bid> Bids = new List<Bid>();
 
-    public AuctionItem(string name, string description, bool isOpen, decimal startingPrice, DateTime startTime, DateTime endTime, string userId)
+    public AuctionItem(string name, string description, bool isOpen, decimal startingPrice, DateTime startTime, DateTime endTime, string userName)
     {
         Name = name;
-        UserId = userId;
+        UserName = userName;
         Description = description;
         IsOpen = isOpen;
         StartingPrice = startingPrice;

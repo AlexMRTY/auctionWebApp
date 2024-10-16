@@ -40,4 +40,5 @@ public class GenericPersistence<T> : IGenericPersistence<T> where T : BaseDB
         _context.Update(entity);
         _context.SaveChanges(); 
     }
+    
 }

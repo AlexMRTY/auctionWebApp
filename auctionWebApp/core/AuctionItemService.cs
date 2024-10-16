@@ -1,4 +1,5 @@
 ﻿using auctionWebApp.core.Interface;
+using auctionWebApp.Models;
 using auctionWebApp.persistence;
 using AutoMapper;
 
@@ -34,6 +35,11 @@ public class AuctionItemService : IAuctionItemService
     public AuctionItem GetAuctionItemById (int id)
     {
         throw new NotImplementedException();
+    }
+    
+    public void CreateAuctionItem (AuctionItemVm auctionItemVm)
+    {
+        _auctionItemPersistence.Add(_mapper.Map<AuctionItemDb>(auctionItemVm));
     }
 
     // private static readonly IReadOnlyList<AuctionItem> _auctionItems;
