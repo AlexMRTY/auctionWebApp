@@ -21,7 +21,11 @@ public class AuctionController : Controller
         _auctionItemService = auctionItemService;
         _mapper = mapper;
     }
-    
+
+    public IActionResult Details(int id)
+    {
+        return View(_mapper.Map<AuctionItemVm>(_auctionItemService.GetAuctionItemById(id)));
+    }
 
     public IActionResult CreateAuctionItem()
     {
