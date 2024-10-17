@@ -38,13 +38,9 @@ public class AuctionController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult CreateAuctionItem(AuctionItemVm auctionItemVm)
     {
-        
-        
-        if (
-            auctionItemVm.Name.IsNullOrEmpty() ||
+        if (auctionItemVm.Name.IsNullOrEmpty() ||
             auctionItemVm.Description.IsNullOrEmpty() ||
-            auctionItemVm.StartingPrice <= 0
-            )
+            auctionItemVm.StartingPrice <= 0)
         {
             return View(auctionItemVm);
         }
