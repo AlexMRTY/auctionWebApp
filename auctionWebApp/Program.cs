@@ -15,6 +15,7 @@ builder.Services.AddControllersWithViews();
 
 // dependency injection of service into controller
 builder.Services.AddScoped<IAuctionItemService, AuctionItemService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // dependency injection of persistence into service
 builder.Services.AddScoped<IAuctionItemPersistence, AuctionItemPersistence>();

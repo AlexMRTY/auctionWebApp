@@ -24,6 +24,7 @@ public class AuctionController : Controller
 
     public IActionResult Details(int id)
     {
+        List<UserVm> users = new List<UserVm>();
         return View(_mapper.Map<AuctionItemVm>(_auctionItemService.GetAuctionItemById(id)));
     }
 
@@ -36,7 +37,9 @@ public class AuctionController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult CreateAuctionItem(AuctionItemVm auctionItemVm)
     {
-        if (!ModelState.IsValid)
+        if (auctionItemVm.Name.IsNullOrEmpty() ||
+            auctionItemVm.Description.IsNullOrEmpty() ||
+            auctionItemVm.StartingPrice <= 0)
         {
             return View(auctionItemVm);
         }
