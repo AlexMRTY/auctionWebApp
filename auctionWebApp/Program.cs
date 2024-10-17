@@ -29,7 +29,7 @@ builder.Services.AddDbContext<AuctionDbContext>(options =>
 });
 
 builder.Services.AddDbContext<AppIdentityDbContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("IdentityDbConnection")));
-builder.Services.AddDefaultIdentity<AppIdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppIdentityDbContext>();
+builder.Services.AddDefaultIdentity<AppIdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
 
 
 // Auto mapper
@@ -61,5 +61,34 @@ app.MapControllerRoute(
 // app.MapControllerRoute(
 //     name: "default",
 //     pattern: "{controller=AuctionItem}/{action=CreateAuctionItem}");
+
+using (var serviceScope = app.Services.CreateScope())
+{
+    var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var roles = new {Admin = "Admin"};
+    
+    if (!await roleManager.RoleExistsAsync(roles.Admin))
+        await roleManager.CreateAsync(new IdentityRole(roles.Admin));
+}
+
+using (var serviceScope = app.Services.CreateScope())
+{
+    var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<AppIdentityUser>>();
+    
+    string email = "admin@gmail.com";
+    string password = "Test1234,";
+
+    if (await userManager.FindByEmailAsync(email) == null)
+    {
+        var user = new AppIdentityUser();
+        user.UserName = email;
+        user.Email = email;
+        user.EmailConfirmed = true;
+        
+        await userManager.CreateAsync(user, password);
+        
+        await userManager.AddToRoleAsync(user, "Admin");
+    }
+}
 
 app.Run();
