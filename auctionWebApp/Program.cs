@@ -19,6 +19,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 // dependency injection of persistence into service
 builder.Services.AddScoped<IAuctionItemPersistence, AuctionItemPersistence>();
+builder.Services.AddScoped<IUserPersistence, UserPersistence>();
 
 // dependency injection of generic persistence into persistence
 builder.Services.AddScoped(typeof(IGenericPersistence<>), typeof(GenericPersistence<>));

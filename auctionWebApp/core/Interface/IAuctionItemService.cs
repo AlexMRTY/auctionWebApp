@@ -9,5 +9,8 @@ public interface IAuctionItemService
     AuctionItem GetAuctionItemById (int id);
     
     void CreateAuctionItem (AuctionItemVm auctionItemVm);
+
+    public bool DeleteAuctionItemById(int id);
+    
     public void UpdateDescription(int id, string description, string userName, string userIdentity);
 }

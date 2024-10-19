@@ -67,9 +67,10 @@
                 @Html.DisplayFor(modelItem => item.IsOpen)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                <form asp-action="DeleteAuction" asp-controller="Admin" method="post", style="display: inline">
+                    <input type="hidden", name="id", value="@item.Id"/>
+                    <button type="submit">Delete</button>
+                </form>
             </td>
         </tr>
 }
