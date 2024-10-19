@@ -1,4 +1,4 @@
-@model auctionWebApp.Models.AuctionItemVm
+@model auctionWebApp.Models.AuctionDetailsVm
 
 @{
     ViewData["Title"] = "Details";
@@ -7,7 +7,7 @@
 <h1>Details</h1>
 
 <div>
-    <h4>AuctionItemVm</h4>
+    <h4>AuctionDetailsVm</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -59,6 +59,44 @@
             @Html.DisplayFor(model => model.IsOpen)
         </dd>
     </dl>
+    
+    <div>
+        <h4>Bids</h4>
+        <hr />
+        <table class="table">
+            <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Bids[0].UserName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Bids[0].Amount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Bids[0].PlaceTime)
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            
+
+            @foreach (var item in Model.Bids)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PlaceTime)
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 </div>
 <div>
     @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |

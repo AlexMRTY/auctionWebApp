@@ -45,10 +45,25 @@ public class GenericPersistence<T> : IGenericPersistence<T> where T : BaseDB
         return query.ToList();
     }
 
-    public T GetById(int id)
+    public T GetById(int id, Expression<Func<T, object>>? include = null)
     {
-        var entity = _context.Find<T>(id);
-        return entity;
+        IQueryable<T> query = entity;
+        
+        // Dynamically apply the Include expression
+        if (include != null)
+        {
+            query = query.Include(include);
+        }
+        
+        var result  = query.FirstOrDefault(e => EF.Property<int>(e, "Id") == id);
+        
+        // If bids are included, sort them by price in descending order
+        if (result  is AuctionItemDb auction && auction.Bids != null)
+        {
+            auction.Bids = auction.Bids.OrderByDescending(b => b.Amount).ToList();
+        }
+
+        return result ;
     }
 
     public void Update(T entity)

@@ -43,8 +43,11 @@
                 @Html.DisplayFor(modelItem => item.StartingPrice)
             </td>
             <td>
-                @Html.ActionLink("Edit Description", "EditDescription", "Auction", new { id=item.Id }) |
-                @Html.ActionLink("Details", "Details", "Auction", new {  id=item.Id  })
+                @if(User.Identity.Name == item.UserName)
+                {
+                    @Html.ActionLink("Edit Description", "EditDescription", "Auction", new { id = item.Id, userName=item.UserName })
+                }
+                @Html.ActionLink("Details", "Details", "Auction", new { id = item.Id })
             </td>
         </tr>
 }

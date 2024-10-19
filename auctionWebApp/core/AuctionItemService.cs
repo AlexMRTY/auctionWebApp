@@ -47,7 +47,9 @@ public class AuctionItemService : IAuctionItemService
     
     public AuctionItem GetAuctionItemById (int id)
     {
-        return _mapper.Map<AuctionItem>(_auctionItemPersistence.GetById(id));
+        return _mapper.Map<AuctionItem>(_auctionItemPersistence.GetById(
+            id,
+            a => a.Bids));
     }
     
     public void CreateAuctionItem (AuctionItemVm auctionItemVm)
@@ -61,10 +63,12 @@ public class AuctionItemService : IAuctionItemService
         _auctionItemPersistence.Add(_mapper.Map<AuctionItemDb>(auctionItemVm));
     }
     
-    public void UpdateDescription(int id, string description)
+    public void UpdateDescription(int id, string description, string userName, string userIdentity)
     {
         if (description.IsNullOrEmpty()) throw new DataException();
-
+        
+        if (userName != userIdentity) throw new DataException("Unauthorized");
+        
         AuctionItemDb item;
         try
         {

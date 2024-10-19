@@ -24,7 +24,9 @@ public class AuctionController : Controller
 
     public IActionResult Details(int id)
     {
-        return View(_mapper.Map<AuctionItemVm>(_auctionItemService.GetAuctionItemById(id)));
+        AuctionItem auctionItem = _auctionItemService.GetAuctionItemById(id);
+        AuctionDetailsVm auctionDetailsVm = _mapper.Map<AuctionDetailsVm>(auctionItem);
+        return View(auctionDetailsVm);
     }
 
     public IActionResult CreateAuctionItem()
@@ -36,7 +38,13 @@ public class AuctionController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult CreateAuctionItem(AuctionItemVm auctionItemVm)
     {
-        if (!ModelState.IsValid)
+        
+        
+        if (
+            auctionItemVm.Name.IsNullOrEmpty() ||
+            auctionItemVm.Description.IsNullOrEmpty() ||
+            auctionItemVm.StartingPrice <= 0
+            )
         {
             return View(auctionItemVm);
         }
@@ -55,8 +63,9 @@ public class AuctionController : Controller
     }
 
 
-    public IActionResult EditDescription(int id)
+    public IActionResult EditDescription(int id, string userName)
     {
+        
         AuctionItem auctionItem = _auctionItemService.GetAuctionItemById(id);
         return View(_mapper.Map<AuctionItemVm>(auctionItem));
     }
@@ -72,7 +81,7 @@ public class AuctionController : Controller
         
         try
         {
-            _auctionItemService.UpdateDescription(auctionItemVm.Id, auctionItemVm.Description);
+            _auctionItemService.UpdateDescription(auctionItemVm.Id, auctionItemVm.Description, auctionItemVm.UserName, User.Identity.Name);
         }
         catch ( DataException e)
         {
