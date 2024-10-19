@@ -40,9 +40,27 @@ public class AuctionItemService : IAuctionItemService
         return auctionItems;
     }
     
-    public IReadOnlyList<AuctionItem> GetAllAuctionItemsByUserName(string username)
+    public IReadOnlyList<AuctionItem> GetAllAuctionItemsByUserName(string userName)
     {
-        throw new NotImplementedException();
+        List<AuctionItem> auctionItems;
+        try
+        {
+            List<AuctionItemDb> auctionItemDbs = _auctionItemPersistence.GetAll(
+                a => a.UserName == userName, 
+                q => q.OrderBy(a => a.EndTime)
+            );
+            auctionItems = new List<AuctionItem>();
+            foreach (var auctionItemDb in auctionItemDbs)
+            {
+                AuctionItem auctionItem = _mapper.Map<AuctionItem>(auctionItemDb);
+                auctionItems.Add(auctionItem);
+            }
+        } catch (DataException e)
+        {
+            throw new DataException("No items found");
+        }
+         
+        return auctionItems;
     }
     
     public AuctionItem GetAuctionItemById (int id)
