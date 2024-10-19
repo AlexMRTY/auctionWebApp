@@ -1,0 +1,81 @@
+@model IEnumerable<auctionWebApp.Models.AuctionItemVm>
+
+@{
+    ViewData["Title"] = "MyAuctions";
+}
+
+<h1>MyAuctions</h1>
+
+<p>
+    <a asp-controller="Auction" asp-action="CreateAuctionItem">Create New</a>
+    <a asp-action="Index">All Auctions</a>
+    <a asp-action="WonAuctions">Won Auctions</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartingPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ClosingPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsOpen)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartingPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ClosingPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EndTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsOpen)
+            </td>
+            <td>
+                @if(User.Identity.Name == item.UserName)
+                {
+                @Html.ActionLink("Edit Description", "EditDescription", "Auction", new { id = item.Id, userName=item.UserName })
+                }
+                @Html.ActionLink("Details", "Details", "Auction", new { id = item.Id })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

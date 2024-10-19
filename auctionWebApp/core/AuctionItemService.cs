@@ -1,8 +1,11 @@
 ﻿using System.Data;
+using auctionWebApp.Areas.Identity.Data;
 using auctionWebApp.core.Interface;
 using auctionWebApp.Models;
 using auctionWebApp.persistence;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 
 namespace auctionWebApp.core;
@@ -10,11 +13,17 @@ namespace auctionWebApp.core;
 public class AuctionItemService : IAuctionItemService
 {
     private readonly IAuctionItemPersistence _auctionItemPersistence;
+    private readonly IBidPersistence _bidPersistence;
     private readonly IMapper _mapper;
     
-    public AuctionItemService (IAuctionItemPersistence auctionItemPersistence, IMapper mapper)
+    public AuctionItemService (
+        IAuctionItemPersistence auctionItemPersistence,
+        IBidPersistence bidPersistence,
+        IMapper mapper
+        )
     {
         _auctionItemPersistence = auctionItemPersistence;
+        _bidPersistence = bidPersistence;
         _mapper = mapper;
     }
     public List<AuctionItem> GetAllAuctionItems()
@@ -42,6 +51,7 @@ public class AuctionItemService : IAuctionItemService
     
     public IReadOnlyList<AuctionItem> GetAllAuctionItemsByUserName(string userName)
     {
+        if (userName.IsNullOrEmpty()) throw new DataException("No user name provided");
         List<AuctionItem> auctionItems;
         try
         {
@@ -52,6 +62,55 @@ public class AuctionItemService : IAuctionItemService
             auctionItems = new List<AuctionItem>();
             foreach (var auctionItemDb in auctionItemDbs)
             {
+                AuctionItem auctionItem = _mapper.Map<AuctionItem>(auctionItemDb);
+                auctionItems.Add(auctionItem);
+            }
+        } catch (DataException e)
+        {
+            throw new DataException("No items found");
+        }
+         
+        return auctionItems;
+    }
+
+    public IReadOnlyList<AuctionItem> GetAllAuctionsWithUserBids(string userName)
+    {
+        List<AuctionItem> auctionItems;
+        try
+        {
+            List<AuctionItemDb> auctionItemDbs = _auctionItemPersistence.GetAll(
+                a => a.Bids.Any(b => b.UserName == userName) && a.EndTime > DateTime.Now, 
+                a => a.Bids,
+                q => q.OrderBy(a => a.EndTime)
+            );
+            auctionItems = new List<AuctionItem>();
+            foreach (var auctionItemDb in auctionItemDbs)
+            {
+                AuctionItem auctionItem = _mapper.Map<AuctionItem>(auctionItemDb);
+                auctionItems.Add(auctionItem);
+            }
+        } catch (DataException e)
+        {
+            throw new DataException("No items found");
+        }
+         
+        return auctionItems;
+    }
+    
+    public IReadOnlyList<AuctionItem> GetAllAuctionsWhereUserWinner(string userName)
+    {
+        List<AuctionItem> auctionItems;
+        try
+        {
+            List<AuctionItemDb> auctionItemDbs = _auctionItemPersistence.GetAll(
+                a => a.Bids.Any(b => b.UserName == userName) && a.EndTime < DateTime.Now, 
+                a => a.Bids,
+                q => q.OrderBy(a => a.EndTime)
+            );
+            auctionItems = new List<AuctionItem>();
+            foreach (var auctionItemDb in auctionItemDbs)
+            {
+                if (auctionItemDb.Bids.First().UserName != userName) continue;
                 AuctionItem auctionItem = _mapper.Map<AuctionItem>(auctionItemDb);
                 auctionItems.Add(auctionItem);
             }
@@ -105,6 +164,26 @@ public class AuctionItemService : IAuctionItemService
         {
             throw new DataException("Update failed");
         }
+    }
+
+    public void AddBid(int amount, int auctionItemId, string userName)
+    {
+        if (amount <= 0 || auctionItemId == 0) throw new DataException();
+        
+        AuctionItemDb auctionItem = _auctionItemPersistence.GetById(auctionItemId, a => a.Bids);
+        if (auctionItem.EndTime < DateTime.Now) throw new DataException("Auction has ended");
+        if (auctionItem.UserName == userName) throw new DataException("Cannot bid on own item");
+        foreach (var bid in auctionItem.Bids)
+        {
+            if (bid.Amount >= amount) throw new DataException("Bid too low");
+        } 
+        _bidPersistence.Add(new BidDb
+        {
+            Amount = amount,
+            PlacedTime = DateTime.Now,
+            UserName = userName,
+            AuctionItemId = auctionItemId
+        });
     }
 
     // private static readonly IReadOnlyList<AuctionItem> _auctionItems;

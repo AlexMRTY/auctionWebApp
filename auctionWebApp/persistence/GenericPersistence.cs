@@ -44,6 +44,37 @@ public class GenericPersistence<T> : IGenericPersistence<T> where T : BaseDB
         
         return query.ToList();
     }
+    
+    public List<T> GetAll(Expression<Func<T, bool>>? filter = null,
+        Expression<Func<T, object>>? include = null,
+        Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null)
+    {
+        IQueryable<T> query = entity;
+        
+        // Apply filtering if a filter is provided
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+        
+        // Dynamically apply the Include expression
+        if (include != null)
+        {
+            query = query.Include(include);
+        }
+
+        var result = query.ToList();
+
+        foreach (var auctionItem in result)
+        {
+            // If bids are included, sort them by price in descending order
+            if (auctionItem is AuctionItemDb auction && auction.Bids != null)
+            {
+                auction.Bids = auction.Bids.OrderByDescending(b => b.Amount).ToList();
+            }
+        }
+        return result;
+    }
 
     public T GetById(int id, Expression<Func<T, object>>? include = null)
     {

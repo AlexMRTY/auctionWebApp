@@ -86,4 +86,27 @@ public class AuctionController : Controller
 
         return RedirectToAction("Index", "Home");
     }
+    
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult AddBid(int amount, int auctionItemId)
+    {
+        if (amount <= 0 || auctionItemId == null)
+        {
+            return BadRequest();
+        }
+        
+        try
+        {
+            _auctionItemService.AddBid(amount, auctionItemId, User.Identity.Name);
+            TempData["success"] = "Bid Submitted";
+        }
+        catch ( DataException e)
+        {
+            TempData["error"] = e.Message;
+        }
+        
+        return RedirectToAction("Details", new {id = auctionItemId});
+    }
 }

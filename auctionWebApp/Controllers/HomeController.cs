@@ -1,3 +1,4 @@
+using System.Data;
 using System.Diagnostics;
 using auctionWebApp.core;
 using auctionWebApp.core.Interface;
@@ -29,6 +30,40 @@ public class HomeController : Controller
             auctionItemVms.Add(_mapper.Map<AuctionItemVm>(auctionItem));
         }
         return View(auctionItemVms);
+    }
+
+    public IActionResult MyAuctions()
+    {
+        try
+        {
+            IReadOnlyList<AuctionItem> auctionItems = _auctionItemService.GetAllAuctionsWithUserBids(User.Identity.Name);
+            List<AuctionItemVm> auctionItemVms = new List<AuctionItemVm>();
+            foreach (var auctionItem in auctionItems)
+            {
+                auctionItemVms.Add(_mapper.Map<AuctionItemVm>(auctionItem));
+            }
+            return View(auctionItemVms);
+        } catch (DataException e)
+        {
+            return BadRequest();
+        }
+    }
+    
+    public IActionResult WonAuctions()
+    {
+        try
+        {
+            IReadOnlyList<AuctionItem> auctionItems = _auctionItemService.GetAllAuctionsWhereUserWinner(User.Identity.Name);
+            List<AuctionItemVm> auctionItemVms = new List<AuctionItemVm>();
+            foreach (var auctionItem in auctionItems)
+            {
+                auctionItemVms.Add(_mapper.Map<AuctionItemVm>(auctionItem));
+            }
+            return View(auctionItemVms);
+        } catch (DataException e)
+        {
+            return BadRequest();
+        }
     }
     
     

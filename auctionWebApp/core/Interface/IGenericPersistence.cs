@@ -10,5 +10,9 @@ public interface IGenericPersistence<T> where T : BaseDB
 
     public List<T> GetAll(Expression<Func<T, bool>>? filter = null,
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null);
+    
+    public List<T> GetAll(Expression<Func<T, bool>>? filter = null,
+        Expression<Func<T, object>>? include = null,
+        Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null);
     public T GetById(int id, Expression<Func<T, object>>? include = null);
 }
