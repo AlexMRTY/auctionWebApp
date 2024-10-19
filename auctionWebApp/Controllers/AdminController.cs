@@ -47,24 +47,31 @@ namespace auctionWebApp.Controllers
             return View(auctionItemVms);
         }
         
-        // GET: AdminController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: AdminController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public IActionResult DeleteAuction(int id)
+        {
+            bool result = _auctionItemService.DeleteAuctionItemById(id);
+            if (result == true)
+            {
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        public async Task<IActionResult> DeleteUser(string username)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                await _userService.DeleteUser(username);
+                return View("Index");
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return StatusCode(500, new { Message = $"Error: {ex.Message}" });
             }
         }
     }
