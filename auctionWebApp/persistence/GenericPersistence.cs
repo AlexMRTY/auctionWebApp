@@ -24,6 +24,12 @@ public class GenericPersistence<T> : IGenericPersistence<T> where T : BaseDB
         this.entity.Remove(entity);
         _context.SaveChanges();
     }
+    
+    public void DeleteAll(List<T> entities)
+    {
+        this.entity.RemoveRange(entities);
+        _context.SaveChanges();
+    }
 
     public List<T> GetAll(Expression<Func<T, bool>>? filter = null,
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null)

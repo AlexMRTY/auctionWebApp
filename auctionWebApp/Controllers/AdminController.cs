@@ -1,3 +1,4 @@
+using auctionWebApp.Areas.Identity.Data;
 using auctionWebApp.core;
 using auctionWebApp.core.Interface;
 using auctionWebApp.Models;
@@ -25,7 +26,8 @@ namespace auctionWebApp.Controllers
         public IActionResult Index()
         {
             List<UserVm> users = new List<UserVm>();
-            foreach (var user in _userService.GetAllUsersAsync().Result)
+            List<AppIdentityUser> appIdentityUsers = _userService.GetAllUsersAsync().Result;
+            foreach (var user in appIdentityUsers)
             {
                 UserVm userVm = new UserVm();
                 userVm.Id = user.Id;
@@ -51,23 +53,20 @@ namespace auctionWebApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteAuction(int id)
         {
-            bool result = _auctionItemService.DeleteAuctionItemById(id);
+            var result = _auctionItemService.DeleteAuctionItemById(id);
             if (result == true)
             {
                 return RedirectToAction("Index");
             }
-            else
-            {
-                return BadRequest();
-            }
+            return BadRequest();
         }
 
-        public async Task<IActionResult> DeleteUser(string username)
+        public IActionResult DeleteUser(string username)
         {
             try
             {
-                await _userService.DeleteUser(username);
-                return View("Index");
+                _userService.DeleteUser(username);
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
