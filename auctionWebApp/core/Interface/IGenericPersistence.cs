@@ -6,6 +6,7 @@ public interface IGenericPersistence<T> where T : BaseDB
 {
     public void Add(T entity);
     public void Delete(T entity);
+    public void DeleteAll(List<T> entities);
     public void Update(T entity);
 
     public List<T> GetAll(Expression<Func<T, bool>>? filter = null,

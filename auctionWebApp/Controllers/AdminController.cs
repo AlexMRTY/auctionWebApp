@@ -1,3 +1,4 @@
+using auctionWebApp.Areas.Identity.Data;
 using auctionWebApp.core;
 using auctionWebApp.core.Interface;
 using auctionWebApp.Models;
@@ -25,7 +26,8 @@ namespace auctionWebApp.Controllers
         public IActionResult Index()
         {
             List<UserVm> users = new List<UserVm>();
-            foreach (var user in _userService.GetAllUsersAsync().Result)
+            List<AppIdentityUser> appIdentityUsers = _userService.GetAllUsersAsync().Result;
+            foreach (var user in appIdentityUsers)
             {
                 UserVm userVm = new UserVm();
                 userVm.Id = user.Id;
@@ -47,24 +49,28 @@ namespace auctionWebApp.Controllers
             return View(auctionItemVms);
         }
         
-        // GET: AdminController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: AdminController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public IActionResult DeleteAuction(int id)
+        {
+            var result = _auctionItemService.DeleteAuctionItemById(id);
+            if (result == true)
+            {
+                return RedirectToAction("Index");
+            }
+            return BadRequest();
+        }
+
+        public IActionResult DeleteUser(string username)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _userService.DeleteUser(username);
+                return RedirectToAction("Index");
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return StatusCode(500, new { Message = $"Error: {ex.Message}" });
             }
         }
     }

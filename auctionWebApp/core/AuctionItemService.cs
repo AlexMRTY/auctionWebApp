@@ -139,7 +139,21 @@ public class AuctionItemService : IAuctionItemService
         
         _auctionItemPersistence.Add(_mapper.Map<AuctionItemDb>(auctionItemVm));
     }
-    
+
+    public bool DeleteAuctionItemById(int id)
+    {
+        try
+        {
+            var auction = _auctionItemPersistence.GetById(id);
+            _auctionItemPersistence.Delete(_mapper.Map<AuctionItemDb>(auction));
+            return true;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+        
     public void UpdateDescription(int id, string description, string userName, string userIdentity)
     {
         if (description.IsNullOrEmpty()) throw new DataException();
