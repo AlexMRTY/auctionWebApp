@@ -186,6 +186,7 @@ public class AuctionItemService : IAuctionItemService
         
         AuctionItemDb auctionItem = _auctionItemPersistence.GetById(auctionItemId, a => a.Bids);
         if (auctionItem.EndTime < DateTime.Now) throw new DataException("Auction has ended");
+        if (auctionItem.StartingPrice >= amount) throw new DataException("Bid must be higher than starting price");
         if (auctionItem.UserName == userName) throw new DataException("Cannot bid on own item");
         foreach (var bid in auctionItem.Bids)
         {

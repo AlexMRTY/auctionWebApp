@@ -13,11 +13,13 @@ public class UserService : IUserService
     private UserManager<AppIdentityUser> _userManager;
     
     private readonly IAuctionItemPersistence _auctionItemPersistence;
+    private readonly IBidPersistence _bidPersistence;
 
-    public UserService(UserManager<AppIdentityUser> userManager, IAuctionItemPersistence auctionItemPersistence)
+    public UserService(UserManager<AppIdentityUser> userManager, IAuctionItemPersistence auctionItemPersistence, IBidPersistence bidPersistence)
     {
         _userManager = userManager;
         _auctionItemPersistence = auctionItemPersistence;
+        _bidPersistence = bidPersistence;
     }
 
     public async Task<List<AppIdentityUser>> GetAllUsersAsync()
@@ -31,7 +33,15 @@ public class UserService : IUserService
         // First Fetch the User you want to Delete
         try
         {
-            _auctionItemPersistence.DeleteAll(_auctionItemPersistence.GetAll(x => x.UserName == userName));
+            _auctionItemPersistence.DeleteAll(_auctionItemPersistence.GetAll(
+                x => x.UserName == userName,
+                q => q.OrderBy(x => x.EndTime)
+                )
+            );
+            _bidPersistence.DeleteAll(_bidPersistence.GetAll(
+                x => x.UserName == userName, 
+                q => q.OrderBy(x => x.Amount))
+            );
         } catch (Exception e)
         {
             throw new DataException("Auctions Items not deleted");
